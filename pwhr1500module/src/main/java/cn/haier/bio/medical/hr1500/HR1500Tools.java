@@ -20,24 +20,6 @@ class HR1500Tools {
         return Arrays.equals(crc, check);
     }
 
-    public static byte[] packageResponse(byte[] bytes) {
-        ByteBuf buffer = Unpooled.buffer(4);
-        buffer.writeBytes(HEADER);
-        buffer.writeByte(bytes.length + 2);
-        buffer.writeBytes(bytes);
-
-        byte[] data = new byte[buffer.readableBytes()];
-        buffer.markReaderIndex();
-        buffer.readBytes(data, 0, data.length);
-        buffer.resetReaderIndex();
-        byte[] crc = computeCRC16Code(data, 2, data.length - 2);
-        buffer.writeBytes(crc);
-        data = new byte[buffer.readableBytes()];
-        buffer.readBytes(data, 0, data.length);
-        buffer.release();
-        return data;
-    }
-
     public static byte[] short2Bytes(short value) {
         byte bytes[] = new byte[2];
         bytes[0] = (byte) (0xff & (value >> 8));

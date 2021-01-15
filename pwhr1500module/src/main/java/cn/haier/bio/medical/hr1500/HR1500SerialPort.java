@@ -241,7 +241,7 @@ class HR1500SerialPort implements PWSerialPortListener {
                 case 0:
                     byte[] message = (byte[]) msg.obj;
                     if (null != message && message.length > 0) {
-                        HR1500SerialPort.this.write(HR1500Tools.packageResponse(message));
+                        HR1500SerialPort.this.write(message);
                     }
                     break;
             }
