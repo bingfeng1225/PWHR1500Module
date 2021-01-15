@@ -164,7 +164,12 @@ class HR1500SerialPort implements PWSerialPortListener {
         byte[] data = new byte[frameLength];
         this.buffer.readBytes(data, 0, data.length);
 
-        if (!HR1500Tools.checkFrame(data)) {
+        boolean frame = false;
+        if (null != this.listener && null != this.listener.get()) {
+            frame = this.listener.get().onHR1500CheckFrame(data);
+        }
+
+        if (!frame) {
             this.buffer.resetReaderIndex();
             //当前包不合法 丢掉正常的包头以免重复判断
             this.buffer.skipBytes(2);

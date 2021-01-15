@@ -7,5 +7,7 @@ public interface IHR1500Listener {
 
     void onHR1500Exception(Throwable throwable);
 
+    boolean onHR1500CheckFrame(byte[] data);
+
     void onHR1500PackageReceived(byte[] data);
 }
