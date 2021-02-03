@@ -9,6 +9,7 @@ import io.netty.buffer.Unpooled;
 class HR1500Tools {
 
     public static final byte[] HEADER = {(byte) 0x3C, (byte) 0xC3};
+    public static final byte[] SPECIAL = {(byte) 0x3C, (byte) 0x55};
 
     public static boolean checkHeader(byte[] header) {
         return Arrays.equals(HEADER, header);

@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements IHR1500Listener {
         HR1500Manager.getInstance().release();
     }
 
+
     @Override
     public void onHR1500Connected() {
 
@@ -37,6 +38,11 @@ public class MainActivity extends AppCompatActivity implements IHR1500Listener {
     @Override
     public void onHR1500Exception(Throwable throwable) {
 
+    }
+
+    @Override
+    public boolean onHR1500CheckFrame(byte[] data) {
+        return false;
     }
 
     @Override

@@ -24,6 +24,7 @@ class HR1500SerialPort implements PWSerialPortListener {
     private WeakReference<IHR1500Listener> listener;
 
     public HR1500SerialPort() {
+
     }
 
     public void init(String path) {
@@ -112,6 +113,49 @@ class HR1500SerialPort implements PWSerialPortListener {
     private void createBuffer() {
         if (this.buffer == null) {
             this.buffer = Unpooled.buffer(4);
+
+
+
+            byte[] bytes1 = new byte[]{
+                    (byte) 0x3C, (byte) 0xC3, (byte) 0x35, (byte) 0x0A, (byte) 0x15, (byte) 0x02,
+                    (byte) 0x02, (byte) 0x02, (byte) 0x0E, (byte) 0x0A, (byte) 0x09, (byte) 0x04
+            };
+            this.buffer.writeBytes(bytes1);
+            this.processBytes55();
+            this.processBytesBuffer();
+
+            byte[] bytes2 = new byte[]{
+                    (byte)0x00, (byte)0x0B, (byte)0x00, (byte)0x0E, (byte)0x00, (byte)0x0F,
+                    (byte)0xFF, (byte)0xF7, (byte)0x00, (byte)0xD1, (byte)0x01, (byte)0x31
+            };
+            this.buffer.writeBytes(bytes2);
+            this.processBytes55();
+            this.processBytesBuffer();
+
+
+            byte[] bytes3 = new byte[]{
+                    (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x02, (byte)0x00, (byte)0x5A,
+                    (byte)0x00, (byte)0xF8, (byte)0x42, (byte)0xEE, (byte)0x4A, (byte)0x00
+            };
+            this.buffer.writeBytes(bytes3);
+            this.processBytes55();
+            this.processBytesBuffer();
+
+
+            byte[] bytes4 = new byte[]{
+                    (byte)0x01, (byte)0x3C, (byte)0x55, (byte)0x39, (byte)0x11, (byte)0x29,
+                    (byte)0x11, (byte)0x2B, (byte)0x01, (byte)0x10, (byte)0x2D, (byte)0x10,
+            };
+
+            this.buffer.writeBytes(bytes4);
+            this.processBytes55();
+            byte[] bytes5 = new byte[]{
+                    (byte)0x37, (byte)0x01, (byte)0x09, (byte)0x00, (byte)0x0A, (byte)0x00,
+                    (byte)0x00, (byte)0x49, (byte)0x9A
+            };
+            this.buffer.writeBytes(bytes5);
+            this.processBytes55();
+            this.processBytesBuffer();
         }
     }
 
@@ -144,6 +188,28 @@ class HR1500SerialPort implements PWSerialPortListener {
             return this.processBytesBuffer();
         }
         return false;
+    }
+
+    private void processBytes55() {
+        int index = HR1500Tools.indexOf(this.buffer, HR1500Tools.SPECIAL);
+        if(index != -1) {
+            byte[] front = new byte[index + 1];
+            this.buffer.readBytes(front, 0, front.length); //读取0x55之前的数据
+            this.buffer.skipBytes(1);//丢弃0x55
+
+            byte[] behind = new byte[this.buffer.readableBytes()];
+            this.buffer.readBytes(behind,0, behind.length);//读取0x55之后的数据
+
+            this.buffer.discardReadBytes(); //丢弃缓冲区内全部数据
+
+            this.buffer.writeBytes(front);
+            this.buffer.writeBytes(behind);
+
+            if (null != this.listener && null != this.listener.get()) {
+                this.listener.get().onHR1500Print("HR1500SerialPort 删除0x55,位置：" + index);
+            }
+            this.processBytes55();
+        }
     }
 
     private boolean processBytesBuffer() {
@@ -231,6 +297,7 @@ class HR1500SerialPort implements PWSerialPortListener {
             return false;
         }
         this.buffer.writeBytes(buffer, 0, length);
+        this.processBytes55();
         return this.processBytesBuffer();
     }
 
